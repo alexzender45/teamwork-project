@@ -1,5 +1,5 @@
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+DATABASE_URL = "postgres://zfjkjgkf:Z29yHoUDKXlKOXCn6-IzLsu_MgdUKq0V@salt.db.elephantsql.com:5432/zfjkjgkf"
 language: node_js
 node_js:
   - "stable"
