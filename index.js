@@ -4,6 +4,7 @@ import Debug from 'debug';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import user from './src/routes/user.route';
+import article from './src/routes/article.route';
 
 dotenv.config();
 const app = express();
@@ -16,12 +17,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use('/api/v1/auth', user);
+app.use('/api/v1', article);
 
 
 app.get('', (req, res) => {
-    res.send('connected');
-  });
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => logger(`App runing on ${port}`));
-  
-  module.exports = app;
+  res.send('connected');
+});
+const port = process.env.PORT || 3000;
+app.listen(port, () => logger(`App runing on ${port}`));
+
+module.exports = app;
