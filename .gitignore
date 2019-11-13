@@ -1,6 +1,5 @@
 node_modules
 .vscode
 .nyc_output
-.env
 .editorconfig
 coverage
