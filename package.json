@@ -7,7 +7,7 @@
     "pretest": "npm run drop && npm run drop && npm run create",
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "showcoverage": "start ./coverage/index.html",
     "start": "set DEBUG=http & nodemon --exec babel-node index.js",
     "create": "babel-node src/model/ createTables",
@@ -28,9 +28,11 @@
     "@babel/core": "^7.6.4",
     "@babel/node": "^7.6.3",
     "@babel/preset-env": "^7.6.3",
+    "coveralls": "^3.0.7",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2"
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0"
   },
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
@@ -41,7 +43,6 @@
     "chai-http": "^4.3.0",
     "cloudinary": "^1.16.0",
     "cors": "^2.8.5",
-    "coveralls": "^3.0.7",
     "cross-env": "^6.0.3",
     "datauri": "^2.0.0",
     "debug": "^4.1.1",
