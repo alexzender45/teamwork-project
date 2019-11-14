@@ -7,7 +7,7 @@
     "pretest": "npm run drop && npm run drop && npm run create",
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "coveralls": "nyc --reporter=lcov --reporter=text-lcov npm test",
+    "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "showcoverage": "start ./coverage/index.html",
     "start": "set DEBUG=http & nodemon --exec babel-node index.js",
     "create": "babel-node src/model/ createTables",
