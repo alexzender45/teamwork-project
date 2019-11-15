@@ -3,12 +3,12 @@ import bodyParser from 'body-parser';
 import Debug from 'debug';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import user from './src/routes/user.route';
-import article from './src/routes/article.route';
-import comment from './src/routes/articleComment.route';
-import giftComment from './src/routes/giftComment.route';
-import gift from './src/routes/gift.route';
-import { cloudinaryConfig } from './src/server/cloudinaryConfig';
+import user from './routes/user.route';
+import article from './routes/article.route'
+import comment from './routes/articleComment.route';
+import giftComment from './routes/giftComment.route';
+import gift from './routes/gift.route';
+import { cloudinaryConfig } from './server/cloudinaryConfig';
 
 dotenv.config();
 const app = express();

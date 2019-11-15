@@ -4,14 +4,20 @@
   "description": "Teamwork-project",
   "main": "app.js",
   "scripts": {
-    "pretest": "npm run drop && npm run drop && npm run create",
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "babel src -d build",
+    "build": "npm run clean && npm run build-babel",
+    "prestart": "npm run build && npm run create",
+    "start": "node build/index.js",
+    "pretest": "npm run build && npm run drop && npm run create",
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "showcoverage": "start ./coverage/index.html",
-    "start": "set DEBUG=http & nodemon --exec babel-node index.js",
-    "create": "babel-node src/model/ createTables",
-    "drop": "babel-node src/model dropTables"
+    "lint": "eslint --ignore-path .gitignore .",
+    "start1": "set DEBUG=http & nodemon --exec babel-node src/index.js",
+    "create": "node build/model/ createTables",
+    "drop": "node build/model dropTables"
   },
   "repository": {
     "type": "git",
