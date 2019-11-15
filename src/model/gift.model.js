@@ -22,7 +22,7 @@ const create_gift_table = () => {
     image_url VARCHAR(255) NOT NULL,
     author_id INT NOT NULL,
     created_on TIMESTAMP DEFAULT Now(),
-    FOREIGN KEY (author_id) REFERENCES users (user_id) ON UPDATE CASCADE
+    FOREIGN KEY (author_id) REFERENCES users(user_id)
    )`;
 
     pool.query(Gifts).then((res) => {

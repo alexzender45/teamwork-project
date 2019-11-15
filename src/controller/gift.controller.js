@@ -101,7 +101,36 @@ const Gift = {
     },
 
     // Edit gifts
+    async update_gift(req, res) {
+        try {
+            const { user, params: { gift_id }, body: { title, image } } = req;
 
+            // if (!rows[0]) {
+            //     return res.status(404).json({
+            //         status: 'error',
+            //         error: 'Not Found',
+            //     });
+            // }
+            const values = [
+                title,
+                image,
+                gift_id,
+                user
+            ];
+            const response = await db.query(update_gift, values);
+            return res.status(200).json({
+                status: 'success',
+                message: 'Article successfully Updated',
+                data: response.rows[0]
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                status: 'error',
+                error: 'Something went wrong, try again',
+            });
+        }
+    },
 
 
 
