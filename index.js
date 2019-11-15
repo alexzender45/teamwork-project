@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import user from './src/routes/user.route';
 import article from './src/routes/article.route';
 import comment from './src/routes/articleComment.route';
+import giftComment from './src/routes/giftComment.route';
 import gift from './src/routes/gift.route';
 import { cloudinaryConfig } from './src/server/cloudinaryConfig';
 
@@ -24,6 +25,7 @@ app.use('/api/v1/auth', user);
 app.use('/api/v1', article);
 app.use('/api/v1', gift);
 app.use('/api/v1', comment);
+app.use('/api/v1', giftComment);
 
 
 
