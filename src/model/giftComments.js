@@ -52,7 +52,9 @@ const drop_gift_comment_table = async () => {
         client.release();
     }
 };
-
+const post_comment = `INSERT INTO giftComments(gift_id, comment, created_by, created_on) 
+    VALUES($1, $2, $3, $4) returning *`
+const find_gift = `SELECT FROM gifts WHERE gift_id = $1`
 
 pool.on('remove', () => {
     logger();
@@ -61,5 +63,7 @@ pool.on('remove', () => {
 
 export {
     create_gift_comment_table,
-    drop_gift_comment_table
+    drop_gift_comment_table,
+    post_comment,
+    find_gift
 }
