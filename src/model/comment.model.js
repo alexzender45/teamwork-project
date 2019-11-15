@@ -17,11 +17,12 @@ const create_article_comment_table = () => {
     // users
     const ArticleComments = `CREATE TABLE IF NOT EXISTS 
   comments (
+    comment_id SERIAL PRIMARY KEY,
     article_id INT NOT NULL,
     comment VARCHAR (500) NOT NULL,
     created_by VARCHAR(128) NOT NULL,
     created_on TIMESTAMP DEFAULT Now(),
-    FOREIGN KEY (article_id) REFERENCES users (user_id) ON UPDATE CASCADE
+    FOREIGN KEY (article_id) REFERENCES articles(article_id)
    )`;
 
     pool.query(ArticleComments).then((res) => {
@@ -52,10 +53,6 @@ const drop_article_comment_table = async () => {
     }
 };
 
-const create_article_comment_query = `INSERT INTO comments(article_id, comment, created-by, created_on) 
- VALUES($1, $2, $3, $4) returning *`;
-
-const get_article_by_id = 'SELECT * FROM articles WHERE gift_id = $1';
 
 pool.on('remove', () => {
     logger();
@@ -64,7 +61,5 @@ pool.on('remove', () => {
 
 export {
     create_article_comment_table,
-    drop_article_comment_table,
-    create_article_comment_query,
-    get_article_by_id
+    drop_article_comment_table
 }
