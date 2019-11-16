@@ -7,4 +7,6 @@ cache:
     script:
   - npm run coveralls
 
-  
+  after_success:
+- ./node_modules/.bin/jscoverage lib lib-cov
+- ./node_modules/.bin/mocha test/auth.js -R mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js
