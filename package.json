@@ -7,17 +7,18 @@
     "clean": "rm -rf build && mkdir build",
     "build-babel": "babel src -d build",
     "build": "npm run clean && npm run build-babel",
+    "create": "node build/model/ createTables",
+    "drop": "node build/model dropTables",
     "prestart": "npm run build && npm run create",
-    "start": "node build/index.js",
     "pretest": "npm run build && npm run drop && npm run create",
+    "start": "node build/index.js",
+    "web": "node build/index.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "showcoverage": "start ./coverage/index.html",
     "lint": "eslint --ignore-path .gitignore .",
-    "start1": "set DEBUG=http & nodemon --exec babel-node src/index.js",
-    "create": "node build/model/ createTables",
-    "drop": "node build/model dropTables"
+    "start1": "set DEBUG=http & nodemon --exec babel-node src/index.js"
   },
   "repository": {
     "type": "git",
