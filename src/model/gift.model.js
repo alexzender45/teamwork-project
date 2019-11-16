@@ -61,12 +61,17 @@ const update_gift = 'UPDATE gifts SET title = $1, image_url = $2 WHERE gift_id =
 const delete_gift = 'DELETE FROM gifts WHERE gift_id = $1 AND author_id = $2 returning *';
 
 
+
+const get_all_feed_query = 'SELECT article_id, a.created_on, a.title, article, gift_id, b.created_on, b.title, image_url, a.author_id  FROM articles a, gifts b ORDER BY a.created_on DESC';
+
+
 pool.on('remove', () => {
     logger();
     process.exit(0);
 });
 
 export {
+    get_all_feed_query,
     create_gift_table,
     create_gift_query,
     drop_gift_table,

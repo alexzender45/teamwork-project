@@ -8,6 +8,7 @@ import article from './routes/article.route'
 import comment from './routes/articleComment.route';
 import giftComment from './routes/giftComment.route';
 import gift from './routes/gift.route';
+import feed from './routes/feed.route';
 import { cloudinaryConfig } from './server/cloudinaryConfig';
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use('/api/v1', article);
 app.use('/api/v1', gift);
 app.use('/api/v1', comment);
 app.use('/api/v1', giftComment);
+app.use('/api/v1', feed);
 
 
 
