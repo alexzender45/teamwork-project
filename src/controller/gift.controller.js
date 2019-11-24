@@ -3,17 +3,16 @@ import { uploader } from '../server/cloudinaryConfig';
 import {
     create_gift_query,
     get_all_gift_query,
-    get_gift_by_id,
-    update_gift,
-    delete_gift
-} from '../model/gift.model';
+    get_gift_by_id
+} from '../model/tables.model';
 import db from '../model/db';
 
 
 const Gift = {
 
     async add_gift(req, res) {
-        const { body: { title }, user } = req;
+        const { body: { title } } = req;
+        const { user_id } = req.user
 
         if (req.file) {
             const file = dataUri(req).content;
@@ -22,20 +21,20 @@ const Gift = {
                 const values = [
                     title,
                     image,
-                    user,
+                    user_id,
                     new Date()
                 ]
                 try {
                     // eslint-disable-next-line max-len
                     const { rows } = await db.query(create_gift_query, values);
-                    const { gift_id, author_id } = rows[0];
+                    const { gift_id, user_id } = rows[0];
                     return res.status(201).json({
                         status: 'success',
                         data: {
                             message: 'Article added successfully',
                             image_url: image,
                             gift_id,
-                            author_id,
+                            user_id,
                             title,
                             created_on: new Date()
                         },
@@ -89,7 +88,9 @@ const Gift = {
             }
             return res.status(200).json({
                 status: 'success',
-                data: rows,
+                data: {
+                    rows
+                }
             });
         } catch (error) {
             console.log(error)
@@ -100,51 +101,28 @@ const Gift = {
         }
     },
 
-    // Edit gifts
-    async update_gift(req, res) {
-        try {
-            const { user, params: { gift_id }, body: { title, image } } = req;
-
-            // if (!rows[0]) {
-            //     return res.status(404).json({
-            //         status: 'error',
-            //         error: 'Not Found',
-            //     });
-            // }
-            const values = [
-                title,
-                image,
-                gift_id,
-                user
-            ];
-            const response = await db.query(update_gift, values);
-            return res.status(200).json({
-                status: 'success',
-                message: 'Article successfully Updated',
-                data: response.rows[0]
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(400).json({
-                status: 'error',
-                error: 'Something went wrong, try again',
-            });
-        }
-    },
-
-
 
     // Delete articles
     async delete_gift(req, res) {
         try {
-            const { user, params: { gift_id } } = req;
-            const { rows } = await db.query(delete_gift, [gift_id, user]);
+            const { gift_id } = req.params;
+            const { user_id } = req.user
+            const selectGift = {
+                text: 'SELECT * FROM gifts WHERE created_by = $1 AND gift_id= $2',
+                values: [user_id, gift_id],
+            };
+            const { rows } = await db.query(selectGift);
             if (!rows[0]) {
                 return res.status(404).json({
                     status: 'error',
                     error: 'Not Found',
                 });
             }
+            const deleteGift = {
+                text: 'DELETE FROM gifts WHERE gift_id= $1',
+                values: [gift_id],
+            };
+            await db.query(deleteGift);
             return res.status(200).json({
                 status: 'success',
                 data: {

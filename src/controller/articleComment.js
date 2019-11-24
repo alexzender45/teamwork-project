@@ -2,8 +2,11 @@ import db from '../model/db';
 
 const ArticleComment = {
     async add_comment(req, res) {
-        const { user, params: { article_id }, body: { comment, created_on } } = req;
-
+        const { article_id } = req.params
+        const { user_id } = req.user
+        let { comment } = req.body
+        let { created_on } = req.body;
+        created_on = new Date();
         const find_article = {
             text: `SELECT FROM articles WHERE article_id = $1`,
             values: [article_id]
@@ -19,18 +22,19 @@ const ArticleComment = {
             }
             const post_comment = {
                 text: `INSERT INTO comments(article_id, comment, created_by, created_on) 
-                VALUES($1, $2, $3, $4) returning *`,
-                values: [article_id, comment, user, created_on]
+                VALUES($1, $2, $3, $4) RETURNING *`,
+                values: [article_id, comment, user_id, created_on]
             };
-            const response = await db.query(post_comment);
-            const { comment_id } = response.rows[0];
+            const { rows: rowsInsert } = await db.query(post_comment);
             return res.status(201).json({
-                message: 'Comment successfully created',
-                comment_id,
-                created_on: new Date(),
-                article_id,
-
-                comment
+                status: 'Success',
+                data: {
+                    message: 'Comment successfully created',
+                    created_on: rowsInsert[0].created_on,
+                    articleTitle: rows[0].title,
+                    article: rows[0].article,
+                    comment: rowsInsert[0].comment
+                }
             })
         } catch (error) {
             console.log(error)

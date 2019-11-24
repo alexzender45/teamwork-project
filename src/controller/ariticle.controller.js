@@ -1,13 +1,10 @@
 /* eslint-disable camelcase */
 import db from '../model/db';
 import {
-    create_article_query,
     get_all_article_query,
-    delete_article,
-    update_article,
-    get_article_by_id
+    get_article_by_id,
 }
-    from '../model/articles.model';
+    from '../model/tables.model';
 
 
 const Article = {
@@ -18,37 +15,43 @@ const Article = {
     * @returns {object} bus object
     */
     async add_article(req, res) {
-        // eslint-disable-next-line no-console
-        // eslint-disable-next-line object-curly-newline
-        const { body: { title, article }, user } = req;
-        // eslint-disable-next-line prefer-const
+        let { created_on } = req.body;
+        created_on = new Date();
+
+        const { body: { title, article } } = req;
+        const { user_id } = req.user
         if (!title || !article) {
             return res.status(400).json({
                 status: 'error',
                 error: 'Title and Article is reaquired',
             });
         }
-
-        const values = [
-            title,
-            article,
-            user,
-            new Date()
-        ];
+        const queryText = {
+            text: 'SELECT * FROM articles WHERE title = $1',
+            values: [title],
+        };
 
         try {
+            const { rows } = await db.query(queryText);
+            if (rows[0]) {
+                return res.status(401).json({
+                    status: 'error',
+                    error: 'Article already exists',
+                });
+            }
+            const insertArticle = {
+                text: 'INSERT INTO Articles (title, article, created_by, created_on) VALUES($1, $2, $3, $4) RETURNING *',
+                values: [title, article, user_id, created_on],
+            };
             // eslint-disable-next-line max-len
-            const { rows } = await db.query(create_article_query, values);
-            const { article_id, author_id } = rows[0];
+            const { rows: rowsInsert } = await db.query(insertArticle);
             return res.status(201).json({
                 status: 'success',
                 data: {
                     message: 'Article added successfully',
-                    article_id,
-                    title,
-                    article,
-                    author_id,
-                    created_on: new Date(),
+                    article_id: rowsInsert[0].article_id,
+                    created_on: rowsInsert[0].created_on,
+                    title: rowsInsert[0].title,
                 },
             });
         } catch (error) {
@@ -77,7 +80,9 @@ const Article = {
             const { rows } = await db.query(get_all_article_query);
             return res.status(200).json({
                 status: 'success',
-                data: rows,
+                data: {
+                    rows,
+                }
             });
         } catch (error) {
             return res.status(400).json({
@@ -101,7 +106,9 @@ const Article = {
             }
             return res.status(200).json({
                 status: 'success',
-                data: rows,
+                data: {
+                    rows,
+                }
             });
         } catch (error) {
             console.log(error)
@@ -116,25 +123,31 @@ const Article = {
     // Edit articles
     async update_article(req, res) {
         try {
-            const { user, params: { article_id }, body: { title, article } } = req;
-
-            // if (!rows[0]) {
-            //     return res.status(404).json({
-            //         status: 'error',
-            //         error: 'Not Found',
-            //     });
-            // }
-            const values = [
-                title || rows[0].title,
-                article || rows[0].article,
-                article_id,
-                user
-            ];
-            const response = await db.query(update_article, values);
+            const { params: { article_id }, body: { title, article } } = req;
+            const { user_id } = req.user
+            const selectArticle = {
+                text: 'SELECT * FROM articles WHERE created_by = $1 AND article_id= $2',
+                values: [user_id, article_id],
+            };
+            const { rows } = await db.query(selectArticle);
+            if (!rows[0]) {
+                return res.status(404).json({
+                    status: 'error',
+                    error: 'Not Found',
+                });
+            }
+            const update_article = {
+                text: 'UPDATE articles SET title = $1, article = $2 WHERE article_id = $3',
+                values: [title, article, article_id],
+            };
+            await db.query(update_article);
             return res.status(200).json({
                 status: 'success',
-                message: 'Article successfully Updated',
-                data: response.rows[0]
+                data: {
+                    message: 'Article successfully Updated',
+                    title,
+                    article
+                }
             });
         } catch (error) {
             console.log(error);
@@ -150,14 +163,24 @@ const Article = {
     // Delete articles
     async delete_article(req, res) {
         try {
-            const { user, params: { article_id } } = req;
-            const { rows } = await db.query(delete_article, [article_id, user]);
+            const { article_id } = req.params;
+            const { user_id } = req.user
+            const selectArticle = {
+                text: 'SELECT * FROM articles WHERE created_by = $1 AND article_id= $2',
+                values: [user_id, article_id],
+            };
+            const { rows } = await db.query(selectArticle);
             if (!rows[0]) {
                 return res.status(404).json({
                     status: 'error',
                     error: 'Not Found',
                 });
             }
+            const deleteArticle = {
+                text: 'DELETE FROM articles WHERE article_id= $1',
+                values: [article_id],
+            };
+            await db.query(deleteArticle);
             return res.status(200).json({
                 status: 'success',
                 data: {
