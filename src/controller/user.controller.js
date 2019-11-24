@@ -1,12 +1,16 @@
 /* eslint-disable camelcase */
 import moment from 'moment';
 import db from '../model/db';
-import Authentication from '../middleware/Auth';
-import Helper from '../helper/Helper';
 import validate from '../helper/validate';
-import { create_user, login_user } from '../model/user.model';
+import Helper from '../helper/Helper';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { create_user, login_user } from '../model/tables.model';
 
+dotenv.config();
+const { SECRET } = process.env;
 
+const expirationTime = '7hrs';
 const User = {
   /**
    * Create A User
@@ -17,9 +21,8 @@ const User = {
 
   async create(req, res) {
     const {
-      first_name, last_name, email, password, gender, job_role, department, address
+      user_id, first_name, last_name, email, password, gender, job_role, department, address
     } = req.body;
-    let { is_admin } = req.body;
 
     if (!first_name || !last_name || !email || !password || !gender || !job_role || !department || !address) {
       return res.status(400).json({
@@ -28,8 +31,7 @@ const User = {
       });
     }
 
-    // eslint-disable-next-line no-unused-expressions
-    !is_admin ? is_admin = false : true;
+    // eslint-disable-next-line no-unused-expression
 
     if (!validate.isValidEmail(email)) {
       return res.status(400).json({
@@ -57,22 +59,21 @@ const User = {
       department,
       address,
       moment(new Date()),
-      moment(new Date()),
-      is_admin === 'admin',
+
+
+
     ];
 
     try {
-      const { rows } = await db.query(create_user, values);
-      // eslint-disable-next-line no-shadow
-      const { user_id } = rows[0];
-      const token = Authentication.generate_token(rows[0].user_id, rows[0].is_admin, rows[0].email);
+      const { rows: rowsInsert } = await db.query(create_user, values);
+      const token = jwt.sign({ email, user_id }, SECRET, { expiresIn: expirationTime });
 
       return res.status(201).json({
         status: 'success',
         data: {
           message: "User account successfully created",
           token,
-          user_id
+          user_id: rowsInsert[0].user_id,
         },
       });
     } catch (error) {
@@ -98,15 +99,15 @@ const User = {
   * @returns {object} user object
   */
   async login(req, res) {
-    // eslint-disable-next-line no-console
-    if (!req.body.email || !req.body.password) {
+    const { password, email } = req.body;
+    if (!email || !password) {
       return res.status(400).json({
         status: 'error',
         error: 'Some values are missing',
       });
     }
 
-    if (!validate.isValidEmail(req.body.email)) {
+    if (!validate.isValidEmail(email)) {
       return res.status(400).json({
         status: 'error',
         error: 'Please enter a valid email address',
@@ -114,7 +115,7 @@ const User = {
     }
 
     try {
-      const { rows } = await db.query(login_user, [req.body.email]);
+      const { rows } = await db.query(login_user, [email]);
       if (!rows[0]) {
         res.status(401).json({
           status: 'error',
@@ -122,33 +123,29 @@ const User = {
         });
       }
 
-      if (!Helper.compare_password(rows[0].password, req.body.password)) {
+      if (!Helper.compare_password(rows[0].password, password)) {
         res.status(400).json({
           status: 'error',
           error: 'Email or Password not correct',
         });
       }
-      const {
-        // eslint-disable-next-line camelcase
-        user_id, email, is_admin,
-      } = rows[0];
       // generate token
-      const token = Authentication.generate_token(rows[0].user_id, is_admin, email);
+      const token = jwt.sign({ user_id: rows[0].user_id, email: rows[0].email }, SECRET, { expiresIn: expirationTime });
       return res.status(201).json({
         status: 'success',
         data: {
           token,
-          user_id
+          user_id: rows[0].user_id
         },
       });
     } catch (error) {
+      console.log(error)
       return res.status(401).json({
         status: 'error',
         error: 'The credentials you provided is incorrect',
       });
     }
   }
-
 }
 
 export default User;

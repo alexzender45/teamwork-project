@@ -1,10 +1,10 @@
 import express from 'express';
 import GiftComment from '../controller/giftComment';
-import Authentication from '../middleware/Auth';
+import tokenValidator from '../middleware/Auth';
 
 const router = express.Router();
 
-router.post('/gifts/:gift_id/comment', Authentication.verify_token, GiftComment.add_comment);
+router.post('/gifts/:gift_id/comment', tokenValidator.validateUserToken, GiftComment.add_comment);
 
 
 export default router;
