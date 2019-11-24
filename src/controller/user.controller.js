@@ -93,8 +93,6 @@ const User = {
   },
 
   /**
-  * User login
-  * @param {object} req
   * @param {object} res
   * @returns {object} user object
   */
