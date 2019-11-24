@@ -8,9 +8,10 @@
     "build-babel": "babel src -d build",
     "build": "npm run clean && npm run build-babel",
     "create": "node build/model/ createTables",
+    "create1": "babel-node src/model/ createTables",
     "drop": "node build/model dropTables",
     "prestart": "npm run build && npm run create",
-    "pretest": "npm run build && npm run drop && npm run create",
+    "pretest": "npm run create1",
     "start": "node build/index.js",
     "web": "node build/index.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
@@ -63,6 +64,8 @@
     "nodemon": "^1.19.4",
     "nyc": "^14.1.1",
     "pg": "^6.4.2",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "swagger-jsdoc": "^3.4.0",
+    "swagger-ui-express": "^4.1.2"
   }
 }

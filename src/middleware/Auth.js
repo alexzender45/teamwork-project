@@ -4,66 +4,74 @@ import db from '../model/db';
 
 
 dotenv.config();
-const Authentication = {
-  /**
-     * Generate token
-     *
-     * @param {*} user_id
-     * @param {*} email
-     * @param {*} is_admin
-     */
+const { SECRET } = process.env;
 
-  // eslint-disable-next-line camelcase
-  generate_token(user_id, is_admin, email) {
-    const token = jwt.sign({ user_id, is_admin, email },
-      process.env.SECRET, {
-        expiresIn: '7d',
-      });
-    return token;
-  },
+async function queryUser(decoded) {
+  const queryText = 'SELECT * FROM users WHERE user_id = $1';
+  const { rows } = await db.query(queryText, [decoded.user_id]);
+  return rows;
+}
 
-  /**
-   * Verifies user provided token
-   *
-   * @param {*} req
-   * @param {*} res
-   * @param {*} next
-   */
 
-  async verify_token(req, res, next) {
+export const tokenValidator = {
+  async validateUserToken(req, res, next) {
     const { token } = req.headers;
-    try {
-      // verify user provided token
-      const decoded = await jwt.verify(token, process.env.SECRET);
-      const text = 'SELECT * FROM users WHERE user_id = $1';
-      const { rows } = await db.query(text, [decoded.user_id]);
-      // check valid users
-      if (!rows[0]) {
+    if (token) {
+      jwt.verify(token, SECRET, async (err, decoded) => {
+        if (err) return res.status(401).json({
+          status: 'error',
+          error: 'Failed to authenticate token',
+        });
+        const rows = await queryUser(decoded);
+        if (rows[0]) {
+          req.user = rows[0];
+          req.decoded = decoded;
+          return next();
+        }
         return res.status(401).json({
           status: 'error',
-          error: 'Token provided is invalid',
+          error: 'Not a valid user',
         });
-      }
-
-      req.user = decoded.user_id;
-      req.admin = decoded.is_admin;
-
-      return next();
-    } catch (error) {
-      console.log(error);
-      // eslint-disable-next-line no-cond-assign
-      if (error.name === 'tokenExpiredError') {
-        return res.status(401).json({
-          status: 'error',
-          error: 'Token Expired, please login again',
-        });
-      }
+      });
+    } else {
       return res.status(400).json({
-        status: 400,
-        error: 'Ooops! Something went wrong.',
+        status: 'error', error: 'Token not provided',
       });
     }
   },
-};
 
-export default Authentication;
+
+  async validateAdminToken(req, res, next) {
+    const { token } = req.headers;
+
+    if (token) {
+      jwt.verify(token, SECRET, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({
+            status: 'error',
+            error: 'Failed to authenticate token',
+          });
+        }
+        const rows = await queryUser(decoded);
+
+        if (rows[0] && rows[0].is_admin === true) {
+          req.user = rows[0];
+          req.decoded = decoded;
+          return next();
+        }
+        return res.status(403).json({
+          status: 'error',
+          error: 'Not an admin user',
+        });
+      });
+    } else {
+      return res.status(400).json({
+        status: 'error',
+        error: 'token not provided',
+      });
+    }
+  },
+
+}
+
+export default tokenValidator;

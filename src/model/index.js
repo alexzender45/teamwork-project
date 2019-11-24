@@ -4,7 +4,7 @@ import dropTables from './dropTable'
 
 module.exports = {
     createTables,
-    dropTables,
+    dropTables
 }
 
 require('make-runnable');
