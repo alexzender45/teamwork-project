@@ -14,7 +14,7 @@
     "pretest": "npm run create1",
     "start": "node build/index.js",
     "web": "node build/index.js",
-    "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests --exit",
+    "test": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --require @babel/register --timeout 120000 --require @babel/polyfill tests",
     "coverage": "npm run pretest && jest --coverage && cat ./coverage/lcov.info | coveralls",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "showcoverage": "start ./coverage/index.html",
