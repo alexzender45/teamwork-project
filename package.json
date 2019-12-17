@@ -6,11 +6,10 @@
   "scripts": {
     "clean": "rm -rf build && mkdir build",
     "build-babel": "babel src -d build",
-    "build": "npm run clean && npm run build-babel",
+    "build": "npm run build-babel",
     "create": "node build/model/ createTables",
     "create1": "babel-node src/model/ createTables",
     "drop": "node build/model dropTables",
-    "prestart": "npm run build && npm run create",
     "pretest": "npm run create1",
     "start": "node build/index.js",
     "web": "node build/index.js",
