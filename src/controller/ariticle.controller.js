@@ -6,6 +6,7 @@ import {
 }
     from '../model/tables.model';
 
+ const maxlength = 70;
 
 const Article = {
     /**
@@ -26,6 +27,13 @@ const Article = {
                 error: 'Title and Article is reaquired',
             });
         }
+        if(title.length > maxlength){
+            return res.status(400).json({
+                status: 'error',
+                error: 'Please make sure the title is less than 70'   
+        })
+    }
+
         const queryText = {
             text: 'SELECT * FROM articles WHERE title = $1',
             values: [title],

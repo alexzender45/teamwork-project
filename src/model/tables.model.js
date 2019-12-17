@@ -35,7 +35,7 @@ const create_article_table = () => {
       CREATE TABLE articles (
       article_id SERIAL PRIMARY KEY,
       title VARCHAR (128) NOT NULL,
-      article VARCHAR(128) NOT NULL,
+      article VARCHAR NOT NULL,
       created_by INT NOT NULL REFERENCES users(user_id),
       created_on TIMESTAMP DEFAULT Now()
      );
@@ -53,7 +53,7 @@ const create_article_table = () => {
      CREATE TABLE comments (
        comment_id SERIAL PRIMARY KEY,
        article_id SERIAL NOT NULL REFERENCES articles(article_id),
-       comment VARCHAR (500) NOT NULL,
+       comment VARCHAR  NOT NULL,
        created_by INT NOT NULL REFERENCES users(user_id),
        created_on TIMESTAMP DEFAULT Now()
       );
@@ -62,7 +62,7 @@ const create_article_table = () => {
     CREATE TABLE giftComments (
         comment_id SERIAL PRIMARY KEY,
         gift_id INT NOT NULL REFERENCES gifts(gift_id),
-        comment VARCHAR (500) NOT NULL,
+        comment VARCHAR NOT NULL,
         created_by SERIAL NOT NULL REFERENCES users(user_id),
         created_on TIMESTAMP DEFAULT Now()
        ) `;
