@@ -33,7 +33,8 @@ const ArticleComment = {
                     created_on: rowsInsert[0].created_on,
                     articleTitle: rows[0].title,
                     article: rows[0].article,
-                    comment: rowsInsert[0].comment
+                    comment: rowsInsert[0].comment,
+                    created_by: rowsInsert[0].created_by
                 }
             })
         } catch (error) {
