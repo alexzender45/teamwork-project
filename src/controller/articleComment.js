@@ -43,6 +43,30 @@ const ArticleComment = {
                 error: 'Something went wrong, try again',
             });
         }
+    }, 
+    async getAllComments(req, res){
+        const { article_id } = req.params;
+        try {
+            const get_comment = {
+                text: `SELECT * FROM comments where article_id = $1`,
+                values:[article_id]
+
+            };
+            const { rows } = await db.query(get_comment);
+            return res.status(200).json({
+                status: 'Success',
+                data: {
+                    message: 'Comment successfully Retrive',
+                    comment: rows
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                status: 'error',
+                error: 'Something went wrong, try again',
+            });
+        }
     }
 }
 
