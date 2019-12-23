@@ -86,6 +86,7 @@ export const create_user = `INSERT INTO
      returning *`;
 
 export const login_user = 'SELECT * FROM users WHERE email = $1';
+export const get_user_by_id = 'SELECT * FROM users WHERE user_id = $1';
 
 export const create_gift_query = `INSERT INTO gifts(title, image_url, created_by, created_on) 
 VALUES($1, $2, $3, $4) returning *`;

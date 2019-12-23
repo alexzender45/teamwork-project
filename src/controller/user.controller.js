@@ -5,7 +5,7 @@ import validate from '../helper/validate';
 import Helper from '../helper/Helper';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { create_user, login_user } from '../model/tables.model';
+import { create_user, login_user, get_user_by_id } from '../model/tables.model';
 
 dotenv.config();
 const { SECRET } = process.env;
@@ -144,7 +144,30 @@ const User = {
         error: 'The credentials you provided is incorrect',
       });
     }
-  }
+  },
+  async get_user_by_id(request, res) {
+    try {
+        const { rows } = await db.query(get_user_by_id, [request.params.user_id]);
+        if (!rows[0]) {
+            return res.status(404).json({
+                status: 'error',
+                error: 'Not Found',
+            });
+        }
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                last_name: rows[0].last_name,
+            }
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({
+            status: 'error',
+            error: 'Something went wrong, try again',
+        });
+    }
+}
 }
 
 export default User;
