@@ -42,6 +42,30 @@ const GiftComment = {
                 status: 'error', error: 'Something went wrong, try again',
             });
         }
+    },
+    async getAllGiftComments(req, res){
+        const { gift_id } = req.params;
+        try {
+            const get_comment = {
+                text: `SELECT * FROM giftComments where gift_id = $1`,
+                values:[gift_id]
+
+            };
+            const { rows } = await db.query(get_comment);
+            return res.status(200).json({
+                status: 'Success',
+                data: {
+                    message: 'Comment successfully Retrive',
+                    comment: rows
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                status: 'error',
+                error: 'Something went wrong, try again',
+            });
+        }
     }
 }
 
