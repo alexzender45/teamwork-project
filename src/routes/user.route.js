@@ -6,7 +6,7 @@ import tokenValidator from '../middleware/Auth';
 
 const router = express.Router();
 
-router.post('/create_user', tokenValidator.validateAdminToken, User.create);
+router.post('/create_user', User.create);
 router.post('/signin', User.login);
 router.get('/user/:user_id',tokenValidator.validateUserToken, User.get_user_by_id);
 
